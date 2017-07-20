@@ -1,3 +1,15 @@
+/**
+ * 将Object转为url params string
+ * @param params
+ * @returns {string}
+ * @private
+ */
+const convertParamToQuery = (params: {}): string => {
+  return Object.keys(params).map((key) => {
+    return `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`;
+  }).join('&');
+};
+
 class Tinker {
     /* global setting */
     static request;
@@ -7,7 +19,7 @@ class Tinker {
     static isFailure;
     static timeout;
     static debounce;
-    static headers;
+    static config;
     static params;
     // 引擎
     static engine;
@@ -19,18 +31,18 @@ class Tinker {
      * @param  {object | array} params  请求参数
      * @return {[type]}         [description]
      */
-    constructor(url, headers, params) {
+    constructor(url, config, params) {
       if (arguments.length !== 3) {
         throw(new Error('arguments error'));
       }
 
       // 参数校验
       if (!url) throw new Error('url should not be null');
-      if (!headers) throw new Error('headers should not be null');
-      if (!headers.method) throw new Error('headers -> method should not be null');
+      if (!config) throw new Error('config should not be null');
+      if (!config.method) throw new Error('config -> method should not be null');
 
       this.url = url;
-      this.headers = { ...Tinker.headers, ...headers };
+      this.config = { ...Tinker.config, ...config };
 
       let requestParams;
       if (Array.isArray(params)) {
@@ -40,13 +52,15 @@ class Tinker {
       }
 
       // body
-      if (headers.method.toUpperCase() === 'GET') {
-        requestParams && this.url = `${this.url}?${convertParamToQuery(requestParams)}`;
+      if (config.method.toUpperCase() === 'GET') {
+        if (requestParams) {
+          this.url = `${this.url}?${convertParamToQuery(requestParams)}`;
+        }
       } else {
-        if (this.headers['Content-type'].indexOf('json') !== -1) {
-          this.headers = { ...this.headers, ...{ body: JSON.stringify(requestParams) } };
+        if (this.config.headers && this.config.headers['Content-type'] && this.config.headers['Content-type'].indexOf('json') !== -1) {
+          this.config = { ...this.config, ...{ body: JSON.stringify(requestParams) } };
         } else {
-          this.headers = { ...this.headers, ...{ body: convertParamToQuery(requestParams) }};
+          this.config = { ...this.config, ...{ body: convertParamToQuery(requestParams) }};
         }
       }
     }
@@ -77,8 +91,8 @@ class Tinker {
       return this;
     }
     // change result
-    transfromResult(transfromResultCallBack: Function): this {
-      this.transfromResultCallBack = transfromResultCallBack;
+    convertResult(convertResultCallBack) {
+      this.convertResultCallBack = convertResultCallBack;
       return this;
     }
 
@@ -88,26 +102,29 @@ class Tinker {
 
       /* global fetch */
       try {
-        const fetchPromise = Tinker.engine(this.url, this.headers);
+        const fetchPromise = fetch(this.url, this.config);
         fetchPromise
           .then(data => data.json())
           .then((data) => {
             let result = data;
-            if (this.transfromResultCallBack) {
-              result = this.transfromResultCallBack(data);
+            if (this.convertResultCallBack) {
+              result = this.convertResultCallBack(data);
             }
 
             // success
-            if (this.isSuccess) {
-              this.isSuccess(result) && this.isSuccessCallBack(result);
-            } else (Tinker.isSuccess) {
-              Tinker.isSuccess(result) && Tinker.success(result);
+            if (this.isSuccessCallBack) {
+              this.isSuccessCallBack(result) && this.successCallBack(result);
+            } else if (Tinker.isSuccess) {
+              if (Tinker.isSuccess && Tinker.isSuccess(result)) {
+                Tinker.success && Tinker.success(result);
+                this.successCallBack && this.successCallBack(result);
+              }
             }
 
             // failure
-            if (this.isFailure) {
-              this.isFailure(result) && this.isFailureCallBack(result);
-            } else {
+            if (this.isFailureCallBack) {
+              this.isFailureCallBack(result) && this.failureCallBack(result);
+            } else if(Tinker.isFailure) {
               Tinker.isFailure(result) && Tinker.failure(result);
             }
           });
@@ -134,3 +151,5 @@ class Tinker {
       }
     }
 }
+
+export default Tinker;
