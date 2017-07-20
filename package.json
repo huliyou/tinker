@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+  },
   "dependencies": {
     "cz-conventional-changelog": "^2.0.0"
   }
