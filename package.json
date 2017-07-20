@@ -1,4 +1,9 @@
 {
+  "name": "tinker",
+  "version": "0.1.0",
+  "description": "javascript fetch helper",
+  "author": "huliyou",
+  "license": "MIT",
   "scripts": {
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
   },
