@@ -1,0 +1,9 @@
+{
+  "presets": [
+    "es2015",
+    "stage-0",
+    "flow",
+    "babel-preset-power-assert"
+  ],
+  "plugins": []
+}

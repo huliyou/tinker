@@ -1,4 +1,5 @@
 /**
+ * @flow
  * 将Object转为url params string
  * @param params
  * @returns {string}
