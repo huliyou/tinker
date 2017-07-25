@@ -7,8 +7,11 @@
  */
 const convertParamToQuery = (params: {}): string => {
   return Object.keys(params).map((key) => {
-    return `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`;
-  }).join('&');
+    if (params[key] !== null || params[key] !== undefined) {
+      return `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`;
+    }
+    return '';
+  }).filter(item => item !== '').join('&');
 };
 
 class Tinker {
