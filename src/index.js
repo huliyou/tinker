@@ -108,7 +108,15 @@ class Tinker {
       try {
         const fetchPromise = fetch(this.url, this.config);
         fetchPromise
-          .then(data => data.json())
+          .then(data => {
+            let result;
+            try {
+              result = data.json();
+            } catch(e) {
+              result = data.text();
+            }
+            return result;
+          })
           .then((data) => {
             let result = data;
             if (this.convertResultCallBack) {
@@ -127,31 +135,39 @@ class Tinker {
 
             // failure
             if (this.isFailureCallBack) {
-              this.isFailureCallBack(result) && this.failureCallBack(result);
+              if (this.isFailureCallBack(result) && this.failureCallBack) {
+                this.failureCallBack(result);
+              }
             } else if(Tinker.isFailure) {
-              Tinker.isFailure(result) && Tinker.failure(result);
+              if (Tinker.isFailure(result)) {
+                if (this.failureCallBack) {
+                  this.failureCallBack(result);
+                } else if (Tinker.failure) {
+                  Tinker.failure(result);
+                }
+              }
             }
           });
-        if (this.timeout && this.timeout > 0) {
-          const abortPromise = new Promise((resolve) => {
-            setTimeout(
-              resolve(() => {
-                this.failureCallBack && this.failureCallBack({ message: '超时' });
-                FetchHandler.globalFailureCallBack &&
-                FetchHandler.globalFailureCallBack({ message: '超时' });
-              }),
-              this.timeout ? this.timeout : 0,
-            );
-          });
-          Promise.race([fetchPromise, abortPromise]);
-        }
+        // if (this.timeout && this.timeout > 0) {
+        //   const abortPromise = new Promise((resolve) => {
+        //     setTimeout(
+        //       resolve(() => {
+        //         this.failureCallBack && this.failureCallBack({ message: '超时' });
+        //         FetchHandler.globalFailureCallBack &&
+        //         FetchHandler.globalFailureCallBack({ message: '超时' });
+        //       }),
+        //       this.timeout ? this.timeout : 0,
+        //     );
+        //   });
+        //   Promise.race([fetchPromise, abortPromise]);
+        // }
       } catch (e) {
-        FetchHandler.globalFailureCallBack && FetchHandler.globalFailureCallBack(e);
-        if (this.failureCallBack) {
-          this.failureCallBack({ message: e });
-        } else {
-          console.error(e);
-        }
+        // FetchHandler.globalFailureCallBack && FetchHandler.globalFailureCallBack(e);
+        // if (this.failureCallBack) {
+        //   this.failureCallBack({ message: e });
+        // } else {
+        //   console.error(e);
+        // }
       }
     }
 }

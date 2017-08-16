@@ -1,4 +1,5 @@
 import * as reduxFetchState from './reduxTinkerState';
+import Tinker from './index';
 
 require('./aop');
 
@@ -62,7 +63,7 @@ function reduxFetch (fetchHandler, actionName, dispatch) {
       originCallBack(params);
       reduxFetch.dispatch({
         type: reduxFetchState.FAILURE(actionName),
-        payload: data,
+        payload: params,
       });
     }
     // fetchHandler.failureCallBack = fetchHandler.failureCallBack.after(
@@ -75,6 +76,7 @@ function reduxFetch (fetchHandler, actionName, dispatch) {
     // );
   } else {
     fetchHandler.failureCallBack = (data) => {
+      Tinker.failure(data);
       reduxFetch.dispatch({
         type: reduxFetchState.FAILURE(actionName),
         payload: data,
