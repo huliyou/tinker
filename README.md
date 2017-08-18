@@ -60,9 +60,9 @@ new Tinker(
 ```
 
 ## TODO
-[] support xhr2 engine
-[] support timeout
-[] support debounce
+- [] support xhr2 engine
+- [] support timeout
+- [] support debounce
 
 ## License
 MIT
