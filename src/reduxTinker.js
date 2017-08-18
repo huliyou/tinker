@@ -1,7 +1,7 @@
 import * as reduxFetchState from './reduxTinkerState';
 import Tinker from './index';
 
-require('./aop');
+// require('./aop');
 
 function reduxFetch (fetchHandler, actionName, dispatch) {
   if (!reduxFetch.dispatch) reduxFetch.dispatch = dispatch;

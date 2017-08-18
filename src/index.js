@@ -120,11 +120,11 @@ class Tinker {
           })
           .then((data) => {
             let result = data;
-            if (this.convertResultCallBack) {
-              result = this.convertResultCallBack(data);
-            }
             if (fakeResult) {
               result = fakeResult;
+            }
+            if (this.convertResultCallBack) {
+              result = this.convertResultCallBack(data);
             }
             // success
             if (this.isSuccessCallBack) {
