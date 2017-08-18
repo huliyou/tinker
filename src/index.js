@@ -1,18 +1,4 @@
-/**
- * @flow
- * 将Object转为url params string
- * @param params
- * @returns {string}
- * @private
- */
-const convertParamToQuery = (params: {}): string => {
-  return Object.keys(params).map((key) => {
-    if (params[key] !== null && params[key] !== undefined) {
-      return `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`;
-    }
-    return '';
-  }).filter(item => item !== '').join('&');
-};
+import { convertParamToQuery } from './util';
 
 class Tinker {
     /* global setting */
@@ -58,13 +44,24 @@ class Tinker {
       // body
       if (config.method.toUpperCase() === 'GET') {
         if (requestParams) {
-          this.url = `${this.url}?${convertParamToQuery(requestParams)}`;
+          const urlParams = convertParamToQuery(requestParams);
+          if (urlParams) {
+            this.url = `${this.url}?${urlParams}`;
+          }
         }
       } else {
-        if (this.config.headers && this.config.headers['Content-type'] && this.config.headers['Content-type'].indexOf('json') !== -1) {
+        if (this.config.headers && this.config.headers['Content-Type'] && this.config.headers['Content-Type'].indexOf('application/json') !== -1) {
           this.config = { ...this.config, ...{ body: JSON.stringify(requestParams) } };
-        } else {
+        } else if (this.config.headers && this.config.headers['Content-Type'] && this.config.headers['Content-Type'].indexOf('application/x-www-form-urlencoded') !== -1){
           this.config = { ...this.config, ...{ body: convertParamToQuery(requestParams) }};
+        } else if (this.config.headers && this.config.headers['Content-Type'] && this.config.headers['Content-Type'].indexOf('multipart/form-data') !== -1) {
+          let formData = new FormData();
+          Object.keys(requestParams).forEach(item => {
+            formData.append(item, requestParams[item]);
+          });
+          this.config = { ...this.config, ...{ body: formData }};
+        } else {
+          throw new Error('not support Content-Type');
         }
       }
     }
@@ -100,13 +97,17 @@ class Tinker {
       return this;
     }
 
-    start() {
+    start(fakeResult) {
       // request
-      this.requestCallBack && this.requestCallBack() || Tinker.request && Tinker.request();
+      if (this.requestCallBack) {
+        this.requestCallBack();
+      } else if (Tinker.request) {
+        Tinker.request();
+      }
 
       /* global fetch */
       try {
-        const fetchPromise = fetch(this.url, this.config);
+        const fetchPromise = Tinker.engine(this.url, this.config);
         fetchPromise
           .then(data => {
             let result;
@@ -122,30 +123,36 @@ class Tinker {
             if (this.convertResultCallBack) {
               result = this.convertResultCallBack(data);
             }
-
+            if (fakeResult) {
+              result = fakeResult;
+            }
             // success
             if (this.isSuccessCallBack) {
               this.isSuccessCallBack(result) && this.successCallBack(result);
             } else if (Tinker.isSuccess) {
               if (Tinker.isSuccess && Tinker.isSuccess(result)) {
                 Tinker.success && Tinker.success(result);
-                this.successCallBack && this.successCallBack(result);
+                // this.successCallBack && this.successCallBack(result);
               }
             }
 
             // failure
             if (this.isFailureCallBack) {
-              if (this.isFailureCallBack(result) && this.failureCallBack) {
-                this.failureCallBack(result);
-              }
+              this.isFailureCallBack(result) && this.failureCallBack(result);
+              // if (this.isFailureCallBack(result) && this.failureCallBack) {
+              //   this.failureCallBack(result);
+              // }
             } else if(Tinker.isFailure) {
-              if (Tinker.isFailure(result)) {
-                if (this.failureCallBack) {
-                  this.failureCallBack(result);
-                } else if (Tinker.failure) {
-                  Tinker.failure(result);
-                }
+              if (Tinker.isFailure && Tinker.isFailure(result)) {
+                Tinker.failure && Tinker.failure(result);
               }
+              // if (Tinker.isFailure(result)) {
+              //   if (this.failureCallBack) {
+              //     this.failureCallBack(result);
+              //   } else if (Tinker.failure) {
+              //     Tinker.failure(result);
+              //   }
+              // }
             }
           });
         // if (this.timeout && this.timeout > 0) {
