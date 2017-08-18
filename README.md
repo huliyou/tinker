@@ -1,28 +1,68 @@
-### method link
+# tinker
 
-global setting
+Flexible promise based control flow.
 
+## Features
+* promise engine to excute async action.
+* support promise isSuccess and success control.
+* support promise isFailure and failure control.
+* support change tinker promise engine
+
+## Installing
+
+## Example
+### global setting
 ```javascript
-tinker.request = () => {};
-tinker.success = () => {};
-tinker.failure = () => {};
-tinker.timeout = 5000;
-tinker.debounce = 2000;
-thnker.headers = {
-};
-tinker.params = {
+// set Tinker promise engine;
+Tinker.engine = fetch.bind(window);
+
+// set the global config
+Tinker.config = {
+  headers: {
+    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+  },
+  credentials: 'include',
 }
+
+Tinker.request = () => {
+  // do something when start.
+};
+Tinker.isSuccess = (result) => {
+  // judge the result is success and return true or false;
+  return true;
+}
+Tinker.success = (result) => {
+  // do something when isSuccess() return true;
+};
+Tinker.isFailure = (result) => {
+  // judge the result is failure and return true or false;
+  return true;
+}
+Tinker.failure = (result) => {
+  // do something when isFailure() return true;
+};
 ```
 
+### usage
 ```javascript
-new tinker('http://url', { headers}, { params })
-  .request(() => {})
-  .isSuccess((response) => return true)
-  .success((response) => {})
-  .isFailure((response, err) => return true)
-  .failure((response, err) => {})
-  .timeout(5000)
-  .debounce(2000)
-  .transfromResult(response => { return response})
+new Tinker(
+  'http://url',
+  { headers: { 'Content-Type': 'application/json'}  },
+  { a: 1}
+)
+  .request(() => { /* do something */})
+  .isSuccess((result) => { /* return boolean */})
+  .success((result) => {/* do something */})
+  .isFailure((result) => {/* return boolean */})
+  .failure((result) => {/* do something */})
+  .transfromResult(result => { return result })
   .start();
 ```
+
+## TODO
+[] support xhr2 engine
+[] support timeout
+[] support debounce
+
+## License
+MIT
