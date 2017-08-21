@@ -1,4 +1,4 @@
-# tinker
+# tinker [![Travis Status](https://travis-ci.org/huliyou/tinker.svg?branch=master)](https://travis-ci.org/huliyou/tinker) 
 
 Flexible promise based control flow.
 
