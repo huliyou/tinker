@@ -9,7 +9,7 @@
     "test": "mocha --require babel-register  --require ./test/setup.js",
     "test:watch": "npm test -- --watch",
     "test:cov": "NODE_ENV=test nyc --reporter=html --reporter=text npm test",
-    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
     "cz-conventional-changelog": "^2.0.0"
@@ -24,6 +24,7 @@
     "babel-preset-power-assert": "^1.0.0",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.24.1",
+    "coveralls": "^2.13.1",
     "intelli-espower-loader": "^1.0.1",
     "jsdom": "^11.1.0",
     "mocha": "^3.4.2",
