@@ -1,4 +1,4 @@
-# tinker [![Travis Status](https://travis-ci.org/huliyou/tinker.svg?branch=master)](https://travis-ci.org/huliyou/tinker) 
+# tinker [![Travis Status](https://travis-ci.org/huliyou/tinker.svg?branch=master)](https://travis-ci.org/huliyou/tinker) [![Coverage Status](https://coveralls.io/repos/github/huliyou/tinker/badge.svg?branch=master)](https://coveralls.io/github/huliyou/tinker?branch=master)
 
 Flexible promise based control flow.
 
