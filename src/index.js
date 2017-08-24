@@ -133,10 +133,10 @@ class Tinker {
               if (Tinker.isSuccess && Tinker.isSuccess(result)) {
                 // Tinker.success && Tinker.success(result);
                 // this.successCallBack && this.successCallBack(result);
-                 if (this.successCallBack) {
+                if (this.successCallBack) {
                   this.successCallBack(result);
                 } else if (Tinker.success) {
-                  Tinker.isSuccess(result);
+                  Tinker.success(result);
                 }
               }
             }
@@ -154,7 +154,7 @@ class Tinker {
                   this.failureCallBack(result);
                 } else if (Tinker.failure) {
                   Tinker.failure(result);
-                } 
+                }
               }
               // if (Tinker.isFailure(result)) {
               //   if (this.failureCallBack) {
