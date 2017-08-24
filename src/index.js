@@ -131,8 +131,13 @@ class Tinker {
               this.isSuccessCallBack(result) && this.successCallBack(result);
             } else if (Tinker.isSuccess) {
               if (Tinker.isSuccess && Tinker.isSuccess(result)) {
-                Tinker.success && Tinker.success(result);
+                // Tinker.success && Tinker.success(result);
                 // this.successCallBack && this.successCallBack(result);
+                 if (this.successCallBack) {
+                  this.successCallBack(result);
+                } else if (Tinker.success) {
+                  Tinker.isSuccess(result);
+                }
               }
             }
 
@@ -144,7 +149,12 @@ class Tinker {
               // }
             } else if(Tinker.isFailure) {
               if (Tinker.isFailure && Tinker.isFailure(result)) {
-                Tinker.failure && Tinker.failure(result);
+                // Tinker.failure && Tinker.failure(result);
+                if (this.failureCallBack) {
+                  this.failureCallBack(result);
+                } else if (Tinker.failure) {
+                  Tinker.failure(result);
+                } 
               }
               // if (Tinker.isFailure(result)) {
               //   if (this.failureCallBack) {
